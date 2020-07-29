@@ -1,2 +1,2 @@
-start node ./main.js
-exit
+node read.js
+pause

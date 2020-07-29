@@ -2,16 +2,18 @@ const fs = require('fs')
 const cp = require('child_process')
 const process = require('process')
 
-let bkpTablePath = {
+let bkpTablePath = {}
+let contentTablePath = {}
+let bkpTableInfo = {
     dirNumbers: 0,
     fileNumbers: 0
 }
-let contentTablePath = {
+let contentTableInfo = {
     dirNumbers: 0,
     fileNumbers: 0
 }
 
-const readDir = (dirPath, tablePath, pointer) => {
+const readDir = (dirPath, tablePath, tableInfo, pointer) => {
     const lastPath = dirPath.split('/').pop()
 
     if(typeof pointer[lastPath] === 'undefined'){
@@ -31,15 +33,15 @@ const readDir = (dirPath, tablePath, pointer) => {
                     if(err) console.log(err)
                     else{
                         if(stats.isDirectory()) {
-                            readDir(`${dirPath}/${files[index]}`, tablePath, pointer)
-                            tablePath.dirNumbers++
+                            readDir(`${dirPath}/${files[index]}`, tablePath, tableInfo, pointer)
+                            tableInfo.dirNumbers++
                         }else{
                             pointer[files[index]] = {
-                                __INFO: {isDirectory: false, mtime: stats.mtime}
+                                __INFO: {isDirectory: false, mtime: stats.mtime, size: stats.size}
                             }
                             // console.log(JSON.stringify(bkpTablePath))
                             // console.log('-----')
-                            tablePath.fileNumbers++
+                            tableInfo.fileNumbers++
                         }
                     }
                 })
@@ -51,8 +53,9 @@ const readDir = (dirPath, tablePath, pointer) => {
 const main = () => {
     const bkpPath = "C:/users/ro7rinke/desktop/bkp"
     const contentPath = "C:/users/ro7rinke/desktop/New Folder"
-    readDir(bkpPath, bkpTablePath, bkpTablePath)
-    readDir(contentPath, contentTablePath, contentTablePath)
+
+    readDir(bkpPath, bkpTablePath, bkpTableInfo, bkpTablePath)
+    readDir(contentPath, contentTablePath, contentTableInfo, contentTablePath)
 }
 
 process.on('beforeExit', () => {
